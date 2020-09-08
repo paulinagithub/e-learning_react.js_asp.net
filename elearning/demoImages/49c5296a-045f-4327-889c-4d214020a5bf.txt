@@ -1,0 +1,294 @@
+ // Przyk³ad 1
+
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            CosRobi();
+            Console.WriteLine("Ci¹g dalszy programu...");
+            Console.ReadKey();
+        }
+
+        static void CosRobi()
+        {
+            while (true)
+            {
+                Console.WriteLine("Coœ siê robi...");
+            }
+        }
+    }
+
+
+ // Przyk³ad 2
+// Dodaj using System.Threading;
+
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Thread t = new Thread(new ThreadStart(CosRobi));
+            t.Start();
+
+            Console.WriteLine("Ci?g dalszy programu...");
+            Console.ReadKey();
+        }
+
+        static void CosRobi()
+        {
+            int x = 0;
+            while (x<10)
+            {
+                Console.WriteLine("Co? si? robi..."); x++;
+            }
+        }
+    }
+
+ // Przyk?ad 3 (abort)
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Thread t = new Thread(new ThreadStart(CosRobi));
+            t.Start();
+            Console.WriteLine("Ci?g dalszy programu...");
+            while (!t.IsAlive) ;  // Wstrzymanie w?tku g??wnego do czasu faktycznego uruchomienia w?tku drugiego
+            Thread.Sleep(1);    // Blokowanie aktualnego w?tku (main) na okre?lony czas,
+                                // aby pozwoli? metodzie CosRobi () na dzia?anie przez pewien czas
+            t.Abort();          // Zatrzymanie w?tku drugiego
+            Console.ReadKey();
+        }
+        static void CosRobi()
+        {
+            try
+            {
+                while (true) Console.WriteLine("Co? si? robi...");
+            }
+            catch (ThreadAbortException ex)    // ten wyj?tek zostanie z?apany po wykonaniu Abort()
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+    }
+
+// Przyk?ad 4 
+    public class Program
+    {
+        public static void Main()
+        {
+            Thread t2 = new Thread(new ThreadStart(OdliczajBiale));   // definicja w?tku
+            t2.Start();
+           
+            OdliczajCzerowone();    // Wywolanie metody odliczajacej w pierwszym watku
+
+            Console.ReadKey();
+        }
+
+        public static void OdliczajBiale()
+        {
+            for (int i = 1000; i > 0; i--)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(i.ToString() + " ");
+            }
+        }
+
+        public static void OdliczajCzerowone()
+        {
+            for (int i = 1000; i > 0; i--)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write(i.ToString() + " ");
+            }
+        }
+    }
+
+###Zadanie1
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ConsoleApplication11
+{
+        public class Program
+        {
+        static object obj = new object();
+            public static void Main()
+            {
+            Thread t2 = new Thread(new ThreadStart(OdliczajBiale));  
+            t2.Start();
+
+            OdliczajCzerowone();  
+
+            Console.ReadKey();
+            }
+
+           public static void OdliczajBiale()
+           {
+                for (int i = 1000; i > 0; i--)
+                lock (obj)
+              {
+                lock (obj)
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(i.ToString() + " ");
+              }
+            }
+
+           public static void OdliczajCzerowone()
+            {
+                for (int i = 1000; i > 0; i--)
+                lock(obj)
+              {
+                lock(obj)
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write(i.ToString() + " ");
+              }
+            }
+        }
+    
+}
+
+###Zadanie2
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ConsoleApplication11
+{
+        public class Program
+        {
+        static object obj = new object();
+            public static void Main()
+            {
+            Thread t2 = new Thread(new ParameterizedThreadStart(Odliczaj));   
+            t2.Start(ConsoleColor.White);
+
+            Odliczaj(ConsoleColor.Red);    
+
+            Console.ReadKey();
+            }
+
+           public static void Odliczaj(object kolor)
+           {
+                for (int i = 1000; i > 0; i--)
+            { 
+                lock (obj)
+                {
+                Console.ForegroundColor = (ConsoleColor)kolor;
+                Console.Write(i.ToString() + " ");
+                }
+            }
+           }
+    
+}
+
+###Zadanie BILANS niezrobione
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading;
+//using System.Threading.Tasks;
+
+//namespace ConsoleApplication11
+//{
+//    public static class Program
+//    {
+//        static object obj = new object();
+//        static int bilans = 500;
+//        //static ThreadStart Odejmij;
+//        //static ThreadStart Dodaj;
+
+//        public static void Main()
+//        //public static Wait(object obj);
+//        //public static bool Wait(object obj, int bilans);
+//        {
+//            Thread t1 = new Thread(new ThreadStart(Odejmij));   // definicja w¹tku
+//        t1.Start();
+//            Thread t2 = new Thread(new ThreadStart(Dodaj));   // definicja w¹tku
+//        t2.Start();
+//            Odejmij();// Wywolanie metody odliczajacej w pierwszym watku
+//        Console.WriteLine(bilans);
+//        Console.WriteLine(obj); 
+//        Console.ReadKey();
+
+//        }
+
+//        public static void Odejmij()
+//        {
+//            for (int i = 1; i < 20; i++)
+//        {
+//                Monitor.Enter(obj);
+//                try
+//                { 
+//                    bilans -= 100;
+//                    //Monitor.Wait(obj);
+//                    Console.WriteLine("Bilans po odjeciu" + bilans);
+//                    while (bilans <= 0)
+//                    { Monitor.Wait(obj);
+//                }
+//                finally
+//                {
+//                    Monitor.Exit(obj);
+//                }
+//            }
+//        public static void Dodaj()
+//        {
+//            for (int i = 1; i < 20; i++)
+//        {
+//                Monitor.Enter(obj);
+//                try
+//                {
+//                     bilans += 100;
+//                        //Monitor.Wait(obj);
+//                        Console.WriteLine("Bilans po dodaniu" + bilans);
+//                }
+//                finally
+//                {
+//                     Monitor.Exit(obj);
+//                }
+//                }
+//            }
+
+//        }
+//    }
+//}
+
+
+####Zadanie domowe
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ConsoleApplication11
+{
+    public class Program
+    {
+        //static object obj = new object(); to bedzie potrzebne do klasy 
+        public static void Main()
+        //string filePath = @"c:\temp\pliki.csv"
+        //public static System.IO.FileStream.Open(string filePath, System.IO.FileMode mode);
+        {
+            Thread t1 = new Thread(new ThreadStart(liczby.szukajdoskonalych));   
+            t1.Start();
+            t1.IsBackground = true;
+            Thread t2 = new Thread(new ThreadStart(liczby.pasekpostepu);   
+            t2.Start();
+            t2.IsBackground = true;
+            Console.Title = "Szukam liczb doskonalych"
+            while (Console.ReadKey(true).Key! = ConsoleKey.Escape) {} 
+
+            t1();    
+
+            Console.ReadKey();
+        }
+      }
+}

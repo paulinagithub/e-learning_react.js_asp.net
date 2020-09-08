@@ -1,0 +1,38 @@
+import React, { Component } from 'react';
+import { Router, Route, Switch } from 'react-router';
+import { Layout } from './components/Custom/Layout';
+import { Home } from './components/Custom/Home';
+
+
+import './custom.css'
+import { ArticleIndex } from './components/Admin/Article/ArticleIndex';
+import { ArticleForm } from './components/Admin/Article/ArticleForm';
+import { NewArticlePreview } from './components/Custom/NewArticlePreview';
+
+import { UserIndexArticle } from './components/User/UserIndexArticle';
+import { UserArticleForm } from './components/User/UserArtaicleForm';
+import { UserIndex } from './components/Admin/UserIndex';
+import { UserForm } from './components/Admin/UserForm';
+
+
+
+export default class App extends Component {
+  static displayName = App.name;
+
+    render() {
+        return (
+      <Layout>
+        <Route exact path='/' component={Home} />
+        <Route path='/article-index/:id' component={ArticleIndex} />
+        <Route path='/user-article-index' component={UserIndexArticle} />
+        <Route path='/article-new/:idAdmin/:id' component={ArticleForm} />
+        <Route path='/article-form-preview-user/:id' component={UserArticleForm} />
+        <Route path='/article-form-preview/:id/:homePage/:idUser' component={NewArticlePreview} />
+        <Route path='/user-index' component={UserIndex} />
+        <Route path='/user-form/:id' component={UserForm} />
+
+            
+      </Layout>
+    );
+  }
+}
